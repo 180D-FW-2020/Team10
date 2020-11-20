@@ -1,0 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Weapon : MonoBehaviour
+{
+
+    public Transform firePoint;
+    public GameObject bulletPrefab;
+    public float offset;
+
+    // Update is called once per frame
+    void Update()
+    {
+        //This allows us to fire a bulletPrefab from a firePoint that we allocated on the scene
+        //This will also allow there to be rotation with respect ot the mouse position on screen. 
+        //I believe later we will have to import the constant change in vertical angle with respect
+        //to a point on screen for the arrow when integrated. 
+        Vector3 difference = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+        float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, rotZ + offset);
+
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        // Shooting Logic
+        GameObject newArrow = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
+
+    }
+}
