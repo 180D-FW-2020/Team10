@@ -13,10 +13,15 @@ cap.set(10,150)
 
 myColors = [[57,76,0,100,255,255]] #green
 
-myColorValues = [[0,255,0]]
+myColorValues = [[0,255,0]] #color of countour?
 
-myPoints = [] ##[x,y,colorId]
 area_int = 0
+area_int_near = 0
+power = 0
+angle = 0
+cy = 0
+cy_near = 0
+cy_i = 0
 
 def findColor(img,myColors,myColorValues):
     imgHSV = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
@@ -26,29 +31,33 @@ def findColor(img,myColors,myColorValues):
         lower = np.array(color[0:3])
         upper = np.array(color[3:6])
         mask = cv2.inRange(imgHSV,lower,upper)
-        x,y,ai=getContours(mask)
+        x,y,ai,yi=getContours(mask)
         #cv2.circle(frameResult, (x,y),10,myColorValues[count],cv2.FILLED)
         if(x!=0 and y!=0):
             newPoints.append([x,y,count])
         count += 1
         #cv2.imshow(str(color[0]),mask)
-    return newPoints, ai
+    return newPoints, ai, yi
 
 
 def getContours(img):
     contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     x,y,dely,delx = 0,0,0,0
     area_i=0
+    cy_i=0
     for cnt in contours:
         area = cv2.contourArea(cnt)
+        M = cv2.moments(cnt)
         if area>500:
             area_i = area
+            cy_i = int(M['m01']/M['m00'])
+            #print(cy_i)
             cv2.drawContours(rec, cnt, -1,(255,0,0),3)
             peri = cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt,0.02*peri,True)
             x, y, delx, dely = cv2.boundingRect(approx)
             #cv2.rectangle(frameResult, (x,y),(x+delx,y+dely),(0,255,0),2)
-    return x+delx//2,y,area_i
+    return x+delx//2,y,area_i,cy_i
 
 
 
@@ -59,8 +68,9 @@ while(True):
     frameResult = frame.copy()
 
     #Draw a box in it wich will contain all we care for
-    cv2.rectangle(frameResult, (155,115),(485,365),(0,255,0),2)
-    rec = frameResult[120:360,160:480] #height first! then the width
+    #cv2.rectangle(frameResult, (155,215),(485,365),(0,255,0),2)
+    #rec = frameResult[0:480,0:640] #height first! then the width
+    rec = frameResult
     
     
     #not sure what is the purpose of this
@@ -70,15 +80,23 @@ while(True):
     #end of purposeless statement
 
     #now analyze what's in the box only
-    _,area_int = findColor(rec, myColors, myColorValues)
+    _,area_int, y_int = findColor(rec, myColors, myColorValues)
 
-    cv2.imshow('ACTUAL', frameResult)
+    cv2.imshow('ACTUAL', frameResult) #this is what you actually see
 
     if(cv2.waitKey(1) & 0xFF == ord('q')):
         break
 
-    elif(cv2.waitKey(1) & 0xFF == ord('p')):
-        print(area_int)
+    elif(cv2.waitKey(1) & 0xFF == ord('w')):
+        area_int_near = area_int
+        cy_near = y_int
+        print(area_int_near,cy_near)
+        
+        
+    elif(cv2.waitKey(1) & 0xFF == ord('s')):
+        power = area_int_near/area_int
+        angle = cy_near - y_int
+        print(power,angle)
 
 #when everything done, release the capture 
 cap.release()
