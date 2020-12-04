@@ -1,5 +1,8 @@
 import numpy as np
-import cv2 
+import cv2
+import socket
+import random
+from time import sleep
 
 #to use the computer camera
 cap = cv2.VideoCapture(0)
@@ -59,12 +62,21 @@ def getContours(img):
             #cv2.rectangle(frameResult, (x,y),(x+delx,y+dely),(0,255,0),2)
     return x+delx//2,y,area_i,cy_i
 
+def BowLocation(angle):
+    s = socket.socket()
 
+    #connect to server on local computer
+    s.connect(('192.168.0.197', 1755))
+    s.send(("0"+","+"0"+","+str(angle)).encode())
+    s.close()
 
 while(True):
     #capture frame-by-frame
     ret, frame = cap.read()
     frame = cv2.flip(frame, 1)
+    if frame is None:
+        print("FUCK")
+        break
     frameResult = frame.copy()
 
     #Draw a box in it wich will contain all we care for
@@ -84,19 +96,23 @@ while(True):
 
     cv2.imshow('ACTUAL', frameResult) #this is what you actually see
 
-    if(cv2.waitKey(1) & 0xFF == ord('q')):
+    pressedKey = cv2.waitKey(1) & 0xFF
+
+    if(pressedKey == ord('q')):
         break
 
-    elif(cv2.waitKey(1) & 0xFF == ord('w')):
+    elif(pressedKey == ord('w')):
         area_int_near = area_int
         cy_near = y_int
-        print(area_int_near,cy_near)
+        print("area near:", area_int_near, "and cy near: ", cy_near)
+        #print("Total score for", name, "is", score)
         
         
-    elif(cv2.waitKey(1) & 0xFF == ord('s')):
+    elif(pressedKey == ord('s')):
         power = area_int_near/area_int
         angle = cy_near - y_int
-        print(power,angle)
+        BowLocation(angle)
+        print("power: ", power, "angle: ", angle)
 
 #when everything done, release the capture 
 cap.release()
