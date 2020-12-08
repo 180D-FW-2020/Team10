@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEngine.Windows.Speech;
 
 public class Weapon : MonoBehaviour
 {
@@ -8,6 +11,28 @@ public class Weapon : MonoBehaviour
     public Transform firePoint;
     public GameObject bulletPrefab;
     public float offset;
+    
+    //attempt at adding ammo
+    public int maxAmmo = 3;
+    private int currentAmmo;
+    //public float reloadTIme = 1f;
+
+    // Attempting to add voice recognition to fire the arrow
+    private KeywordRecognizer keywordRecognizer;
+    private Dictionary<string, Action> actions = new Dictionary<string, Action>();
+
+    void Start()
+    {
+        actions.Add("fire", Shoot);
+        actions.Add("reload", Reload);
+
+        keywordRecognizer = new KeywordRecognizer(actions.Keys.ToArray());
+        keywordRecognizer.OnPhraseRecognized += RecognizedSpeech;
+        keywordRecognizer.Start(); // Use this to start listening, Might be useful so it is not listening always.
+
+        currentAmmo = maxAmmo; // Set's starting ammo to max when launching the game
+
+    }
 
     // Update is called once per frame
     void Update()
@@ -27,11 +52,34 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    private void RecognizedSpeech(PhraseRecognizedEventArgs speech)
+    {
+        Debug.Log(speech.text);
+        actions[speech.text].Invoke();
+    }
+
     void Shoot()
     {
         // Shooting Logic
+        if(currentAmmo > 0)
+        {
         GameObject newArrow = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        }
+        if(currentAmmo <= 0)
+        {
+            Debug.Log("You need to say reload");
+        }
+        currentAmmo--; // This subtracts from our current ammo each time we shoot
 
+    }
 
+    void Reload() 
+    {
+        Debug.Log("Reloading");
+
+        //yield return new WaitForSeconds(reloadTime);
+
+        currentAmmo = maxAmmo;
+        
     }
 }
