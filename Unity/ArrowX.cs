@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class ArrowX : MonoBehaviour
 {
-    public float speed = 20f; //This sets the float speed for the object in game
-    public Rigidbody2D rb;  //Need Rigidbody2D for collision
-    public bool hasHit; //This allows us to use the object to see if it has hit another object on collider
-
+    public float speed = 20f;
+    public Rigidbody2D rb;
+    private bool hasHit;
+    public Vector3 Enemyposition;
+    //public Collider2D tx;
+    Speed speedX;
 
     void Start ()
     {
+        speedX = FindObjectOfType<Speed>();
+        speed = (speedX.speed * 10f);
         rb.velocity = transform.right * speed;
         rb = GetComponent<Rigidbody2D>();
     }
@@ -24,16 +28,31 @@ public class ArrowX : MonoBehaviour
         }
     }
 
-    // happens when the object collides with another object with a collider attatched to it
+
     void OnTriggerEnter2D (Collider2D hitInfo)
     {
         hasHit = true;
         rb.velocity = Vector2.zero;
         rb.isKinematic = true;
-        Destroy(gameObject, 2.0f); 
+
+        Destroy(gameObject, 2.0f);
+        //Debug.Log(hitInfo.name);
+
+
+        /* //This worked at relaying coordinates but for somereason output the same
+        //coordinates for all objects of the board the same. So changing it up
+        // and just creating more than one object on the board to hit
+        // going to implement a massive if statement for the point system. 
+        GameObject gHit = hitInfo.gameObject;
+        Transform tHit = gHit.transform;
+        Enemyposition = new Vector3(tHit.position.x, 
+                                    tHit.position.y, 
+                                    tHit.position.z);
+        Debug.Log(Enemyposition);
+        */
     }
 
-    /*// IGNORE THIS CODE BELOW
+    /*
     void OnCollisionEnter2D(Collision2D collision)
     {
         hasHit = true;
@@ -41,8 +60,7 @@ public class ArrowX : MonoBehaviour
         rb.isKinematic = true;
     }
     
-    //This function should output the name of the object that it hits. 
-    /*void OnTriggerEnter2D (Collider2D hitInfo)
+    void OnTriggerEnter2D (Collider2D hitInfo)
     {
         Debug.Log(hitInfo.name);
         Destroy(gameObject);
