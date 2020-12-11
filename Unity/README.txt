@@ -9,11 +9,15 @@ Some things to note,
     Attach Player (script)
     Attach character 2d controller (script)
     Attach Voice movement (script)
+    Attach Speed (script)
   For the weapon  
     Attach Weapon_rotate (script)
+    Attach M2MqttUnityClientRotate (script)
     Attaching a collider is optional here since the firepoint might hit the bow, only attach if you want object to collide with the weapon
   For the firepoint
     Attach Weapon (script)
+    Attach M2MqttUnityClientFire (script)
+    Attach M2MqttUnityClientReload (script)
     
 For the Target board
   Create as many object connected to the original board
