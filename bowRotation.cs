@@ -38,7 +38,7 @@ namespace M2MqttUnity
     /// <summary>
     /// Generic MonoBehavior wrapping a MQTT client, using a double buffer to postpone message processing in the main thread. 
     /// </summary>
-    public class M2MqttUnityClient : MonoBehaviour
+    public class bowRotation : MonoBehaviour
     {
         Vector3 rot = Vector3.zero;
         [Header("MQTT broker configuration")]
