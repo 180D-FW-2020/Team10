@@ -200,7 +200,7 @@ namespace M2MqttUnity
             string msg = System.Text.Encoding.UTF8.GetString(message);
             //here I will call the function that takes the string and turns it
             //into a vector3
-            rot = 1f* StringToVector3(msg);
+            rot = .1f* StringToVector3(msg);
             Debug.Log("Received: " + msg);
         }
 
@@ -395,7 +395,7 @@ namespace M2MqttUnity
           Vector3 result = new Vector3(
               float.Parse(sArray[0]),
               float.Parse(sArray[1]),
-              float.Parse(sArray[2]));
+              -1f*float.Parse(sArray[2]));
 
           return result;
     }
