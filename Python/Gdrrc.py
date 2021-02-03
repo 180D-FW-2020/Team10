@@ -144,7 +144,7 @@ while True:
         #print('did made it in')
         continue
 
-    if(abs(AccXangle)<100):
+    if(abs(AccYangle)<69):
         if(relVar == 0):
             time.sleep(1.5)
             #print('you reload')
