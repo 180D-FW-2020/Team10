@@ -5,22 +5,6 @@ import threading
 from time import sleep
 import paho.mqtt.client as mqtt
 
-#Settings file where I keep track if im ready to call openCV
-#import settings
-
-#Importing the other files###
-##replace "ocv" with the right name of the openCV file if needed.
-from subprocess import call
-
-class CallPy(object):
-    def __init__(self, path = '/Users/rafaelguerra/Desktop/ocv.py'):
-        self.path = path
-
-    def call_python_file(self):
-        call(["python", "{}".format(self.path)])
-
-
-
 ########END OF SETTING MQTT CONNECTION########################
 global fireVar
 fireVar = 0
@@ -30,8 +14,8 @@ def send_data():
     global fireVar
     while sendDat:
         def on_connect(client, userdata, flags, rc):
-            client.subscribe("MRDMarcher/rotate3")
-            client.subscribe("MRDMarcher/fire3")
+            client.subscribe("MRDMarcher/rotate2")
+            client.subscribe("MRDMarcher/fire2")
         def on_disconnect(client, userdata, rc):
             if rc != 0:
                 print('Unexpected Disconnect')
@@ -52,23 +36,23 @@ def send_data():
         force = float(bigArea)/float(area)
         if fireVar == 69:
             f = "69"
-            client.publish('MRDMarcher/fire3',str.encode(f), qos=1)
+            client.publish('MRDMarcher/fire2',str.encode(f), qos=1)
             fireVar = 0
         else:
             f = str(force)
-            client.publish('MRDMarcher/fire3',str.encode(f), qos=1)
-        client.publish('MRDMarcher/rotate3',str.encode(coordinates), qos=1)
+            client.publish('MRDMarcher/fire2',str.encode(f), qos=1)
+        client.publish('MRDMarcher/rotate2',str.encode(coordinates), qos=1)
         #6 use disconnect() to disconnect from broker
         client.loop_stop()
         client.disconnect()
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-HOST = '192.168.0.197'
+HOST = '192.168.0.127'
 #HOST = '127.0.0.1'
 #PORT = 1883
-PORT = 8080
-#PORT = 9999
+#PORT = 8080
+PORT = 9999
 #to keep track of the threads
 threadCount = 0
 
@@ -91,14 +75,8 @@ try:
 except IOError:
     print ("fuck cant fuck fuck")
 
-#print(settings.ImReady)
 print("Waiting for Connection")
-#settings.ImReady = True
-#print(settings.ImReady)
 serversocket.listen(5)
-
-#c = CallPy()
-#c.call_python_file()
 
 def client_thread(connection):
     #this one connects to openCV, client is who sends data.
@@ -145,7 +123,7 @@ def client_thread_PI(connection):
         if(action == 'r'):
             #print("you reload")
             def on_connect(client, userdata, flags, rc):
-                client.subscribe("MRDMarcher/reload")
+                client.subscribe("MRDMarcher/reload2")
             def on_disconnect(client, userdata, rc):
                 if rc != 0:
                     print('Unexpected Disconnect')
@@ -159,7 +137,7 @@ def client_thread_PI(connection):
             client.loop_start()
             #str_send = coordinates+","+area+","+bigArea+",1"
             str_send = "1"
-            client.publish('MRDMarcher/reload3',str.encode(str_send), qos=1)
+            client.publish('MRDMarcher/reload2',str.encode(str_send), qos=1)
             client.loop_stop()
             client.disconnect()
 
@@ -191,7 +169,7 @@ while True:
     if(address[0]==HOST):
         threading.Thread(target=client_thread, args=(client,)).start()      
     else:
-        #print("else here")
+        print("else here")
         threading.Thread(target=client_thread_PI, args=(client,)).start()
     threadCount+=1
     print("the threadcount is: " + str(threadCount))
